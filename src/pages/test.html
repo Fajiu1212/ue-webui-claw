@@ -69,6 +69,16 @@
             padding: 0;
             box-sizing: border-box;
         }
+
+        /* 全局CSS变量 */
+        :root {
+            --nav-bg-edge: rgba(2, 10, 40, 0.92);
+            --nav-bg-mid: rgba(5, 30, 80, 0.88);
+            --nav-bg-center: rgba(8, 45, 100, 0.90);
+            --nav-accent: rgba(56, 189, 248, 1);
+            --nav-accent-dim: rgba(56, 189, 248, 0.4);
+            --nav-accent-faint: rgba(56, 189, 248, 0.1);
+        }
         
         body {
             font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
@@ -93,23 +103,47 @@
             pointer-events: none;
         }
         
-        /* 科技风格导航栏 - 严格按照图片样式 */
+        /* 科技风格导航栏 - 玻璃拟态渐变样式 */
         .tech-nav-bar {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 80px;
-            background: linear-gradient(90deg, #0a0e27 0%, #0f172a 50%, #0a0e27 100%);
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            background: linear-gradient(
+                90deg,
+                var(--nav-bg-edge) 0%,
+                var(--nav-bg-mid) 25%,
+                var(--nav-bg-center) 50%,
+                var(--nav-bg-mid) 75%,
+                var(--nav-bg-edge) 100%
+            );
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            will-change: backdrop-filter;
+            border-top: none;
             border-left: none;
             border-right: none;
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.3),
-                        inset 0 0 20px rgba(56, 189, 248, 0.1);
+            border-bottom: 1px solid var(--nav-accent-dim);
+            box-shadow: 0 4px 30px rgba(56, 189, 248, 0.25),
+                        0 0 60px var(--nav-accent-faint),
+                        inset 0 1px 0 rgba(56, 189, 248, 0.15),
+                        inset 0 -1px 0 var(--nav-accent-faint);
             z-index: 10;
             overflow: hidden;
         }
         
+        /* 顶部高光线条 */
+        .tech-nav-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.6) 50%, transparent 100%);
+        }
+
         /* 底部蓝色发光线条 */
         .tech-nav-glow-line {
             position: absolute;
@@ -117,15 +151,15 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent 0%, #38bdf8 50%, transparent 100%);
-            box-shadow: 0 0 10px #38bdf8,
-                        0 0 20px #38bdf8,
-                        0 0 30px #38bdf8;
+            background: linear-gradient(90deg, transparent 0%, var(--nav-accent) 50%, transparent 100%);
+            box-shadow: 0 0 10px var(--nav-accent),
+                        0 0 20px var(--nav-accent),
+                        0 0 30px var(--nav-accent);
             animation: glowPulse 3s infinite alternate;
         }
         
         @keyframes glowPulse {
-            0% { opacity: 0.6; }
+            0% { opacity: 0.7; }
             100% { opacity: 1; }
         }
         
