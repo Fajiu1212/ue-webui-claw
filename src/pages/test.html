@@ -72,13 +72,8 @@
 
         /* 全局CSS变量 */
         :root {
-            --nav-bg-edge: rgba(255, 255, 255, 0.97);
-            --nav-bg-mid: rgba(235, 247, 255, 0.95);
-            --nav-bg-center: rgba(210, 238, 255, 0.92);
             --nav-accent: rgba(56, 189, 248, 1);
-            --nav-accent-dim: rgba(56, 189, 248, 0.4);
-            --nav-accent-faint: rgba(56, 189, 248, 0.1);
-            --nav-deco-bar-height: 30px; /* 底部装饰横条高度 */
+            --nav-bg-image: url('https://github.com/user-attachments/assets/3af54751-b68d-4228-abe8-10794ae50587');
         }
         
         body {
@@ -104,116 +99,26 @@
             pointer-events: none;
         }
         
-        /* 科技风格导航栏 - 白色/浅蓝科技背景样式 */
+        /* 科技风格导航栏 - 使用图片作为背景 */
         .tech-nav-bar {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 120px;
-            background:
-                radial-gradient(ellipse 80% 70% at 50% 110%, rgba(56, 189, 248, 0.28) 0%, transparent 65%),
-                linear-gradient(
-                    90deg,
-                    var(--nav-bg-edge) 0%,
-                    var(--nav-bg-mid) 25%,
-                    var(--nav-bg-center) 50%,
-                    var(--nav-bg-mid) 75%,
-                    var(--nav-bg-edge) 100%
-                );
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            will-change: backdrop-filter;
+            background: var(--nav-bg-image) center/100% 100% no-repeat;
             border: none;
-            box-shadow: 0 6px 30px rgba(56, 189, 248, 0.18),
-                        0 2px 8px rgba(0, 0, 0, 0.06);
             z-index: 10;
             overflow: hidden;
         }
 
-        /* 顶部高光线条 */
-        .tech-nav-bar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.5) 50%, transparent 100%);
-        }
-
-        /* 底部装饰性科技横条 */
-        .tech-nav-bar::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: var(--nav-deco-bar-height);
-            /* 金属质感底色 */
-            background-color: rgba(175, 210, 238, 0.85);
-            /* 中心棋格纹叠加在金属底色上 */
-            background-image:
-                /* 中心密集棋格纹（宽度限定在中间约22%区域） */
-                repeating-linear-gradient(
-                    90deg,
-                    rgba(15, 90, 180, 0.78) 0px,
-                    rgba(15, 90, 180, 0.78) 3px,
-                    transparent 3px,
-                    transparent 7px
-                ),
-                /* 金属感渐变（上亮下深，营造立体感） */
-                linear-gradient(
-                    180deg,
-                    rgba(225, 240, 252, 0.95) 0%,
-                    rgba(185, 215, 238, 0.92) 35%,
-                    rgba(150, 192, 225, 0.88) 65%,
-                    rgba(125, 172, 215, 0.85) 100%
-                );
-            background-size: 22% 55%, 100% 100%;
-            background-position: center bottom, 0 0;
-            background-repeat: no-repeat, no-repeat;
-            /* 顶部边线 + 立体阴影 */
-            border-top: 1px solid rgba(56, 189, 248, 0.55);
-            box-shadow:
-                inset 0 2px 4px rgba(255, 255, 255, 0.55),
-                inset 0 -3px 6px rgba(0, 0, 0, 0.10);
-        }
-
-        /* 装饰横条正上方的青蓝发光线 */
-        .tech-nav-glow-line {
-            position: absolute;
-            bottom: calc(var(--nav-deco-bar-height) - 1px); /* 紧贴装饰横条上沿 */
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(
-                90deg,
-                transparent 0%,
-                rgba(56, 189, 248, 0.7) 20%,
-                rgba(255, 255, 255, 0.95) 50%,
-                rgba(56, 189, 248, 0.7) 80%,
-                transparent 100%
-            );
-            box-shadow: 0 0 8px var(--nav-accent),
-                        0 0 18px var(--nav-accent),
-                        0 0 35px var(--nav-accent);
-            animation: glowPulse 3s infinite alternate;
-            z-index: 1;
-        }
-        
-        @keyframes glowPulse {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        
         /* 导航容器 - 一行布局 */
         .tech-nav-container {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: calc(100% - var(--nav-deco-bar-height) - 2px); /* 留出装饰横条 + 发光线的空间 */
+            height: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -572,7 +477,7 @@
     </style>
 </head>
 <body>
-    <!-- 顶部科技导航栏 - 严格按照图片样式 -->
+    <!-- 顶部科技导航栏 - 使用图片作为背景 -->
     <div class="tech-nav-bar">
         <!-- 导航容器 - 一行布局 -->
         <div class="tech-nav-container">
@@ -596,8 +501,6 @@
             </div>
         </div>
         
-        <!-- 底部蓝色发光线条 -->
-        <div class="tech-nav-glow-line"></div>
     </div>
     
     <div class="container">
