@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UE5.5 WebUI 测试页面</title>
+    
+    <!-- UE WebUI 接口初始化脚本 -->
+    <script>
+        /**
+         * UE WebUI 接口初始化
+         * 兼容UE4和UE5的WebUI插件
+         */
+        (function() {
+            'use strict';
+            
+            // 检测UE接口是否存在
+            if (typeof window.ue !== 'object' || typeof window.ue.interface !== 'object') {
+                console.log('[WebUI] 初始化UE接口...');
+                
+                // 创建ue对象（如果不存在）
+                if (typeof window.ue !== 'object') {
+                    window.ue = {};
+                }
+                
+                // 创建interface对象
+                if (typeof window.ue.interface !== 'object') {
+                    window.ue.interface = {};
+                }
+                
+                // 定义broadcast函数（核心通信函数）
+                window.ue.interface.broadcast = function(eventName, data) {
+                    if (typeof eventName === 'string') {
+                        var payload = [eventName, ''];
+                        if (data !== undefined) {
+                            payload[1] = data;
+                        }
+                        
+                        var encodedData = encodeURIComponent(JSON.stringify(payload));
+                        
+                        // 使用History API或location.hash进行通信
+                        if (typeof history === 'object' && typeof history.pushState === 'function') {
+                            history.pushState({}, '', '#' + encodedData);
+                            history.pushState({}, '', '#' + encodeURIComponent('[]'));
+                        } else {
+                            document.location.hash = encodedData;
+                            document.location.hash = encodeURIComponent('[]');
+                        }
+                        
+                        console.log('[WebUI] 发送消息:', eventName, data);
+                    }
+                };
+            } else {
+                // UE接口已存在，使用原生实现
+                console.log('[WebUI] 检测到原生UE接口');
+            }
+            
+            // 创建全局快捷函数ue4
+            window.ue4 = window.ue.interface.broadcast;
+            
+            console.log('[WebUI] UE接口初始化完成');
+        })();
+    </script>
+    
+    <style>
+        /* CSS Reset 和基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 背景装饰效果 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        
+        /* 科技风格导航栏 - 严格按照图片样式 */
+        .tech-nav-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(90deg, #0a0e27 0%, #0f172a 50%, #0a0e27 100%);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-left: none;
+            border-right: none;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.3),
+                        inset 0 0 20px rgba(56, 189, 248, 0.1);
+            z-index: 10;
+            overflow: hidden;
+        }
+        
+        /* 底部蓝色发光线条 */
+        .tech-nav-glow-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #38bdf8 50%, transparent 100%);
+            box-shadow: 0 0 10px #38bdf8,
+                        0 0 20px #38bdf8,
+                        0 0 30px #38bdf8;
+            animation: glowPulse 3s infinite alternate;
+        }
+        
+        @keyframes glowPulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        /* 导航容器 - 一行布局 */
+        .tech-nav-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 3rem;
+            z-index: 11;
+        }
+        
+        /* 左侧按钮组 */
+        .tech-nav-left {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        /* 中间标题 */
+        .tech-nav-title {
+            text-align: center;
+            flex: 1;
+            padding: 0 2rem;
+        }
+        
+        .tech-nav-main-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #38bdf8;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.7),
+                         0 0 40px rgba(56, 189, 248, 0.4);
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* 右侧按钮组 */
+        .tech-nav-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        /* 科技风格按钮 */
+        .tech-nav-btn {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(2, 8, 20, 0.5),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+        
+        .tech-nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.2) 50%, transparent 100%);
+            transition: left 0.5s;
+        }
+        
+        .tech-nav-btn:hover::before {
+            left: 100%;
+        }
+        
+        .tech-nav-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        }
+        
+        .tech-nav-btn:active {
+            transform: translateY(0);
+        }
+        
+        .tech-nav-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            color: white;
+            border-color: rgba(56, 189, 248, 0.8);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5),
+                        inset 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        
+        .tech-nav-btn.active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
+            box-shadow: 0 0 10px #38bdf8;
+        }
+        
+        /* 主容器 */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 6rem); /* 减去顶部菜单栏高度(80px ≈ 5rem) + 间距 */
+            margin-top: 6rem;
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+        }
+        
+        /* 标题区域 */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+        
+        .header p {
+            font-size: 1.125rem;
+            color: #94a3b8;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        /* 主测试区域 */
+        .test-area {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 10px 25px rgba(2, 8, 20, 0.5);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .test-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
+        }
+        
+        /* 按钮样式 */
+        .test-button {
+            background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .test-button:active {
+            transform: translateY(0);
+        }
+        
+        .test-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+        
+        .test-button:hover::after {
+            transform: translateX(100%) rotate(45deg);
+            opacity: 1;
+        }
+        
+        /* 状态显示区域 */
+        .status-area {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(2, 8, 20, 0.4);
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .status-label {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        
+        .status-value {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        
+        .status-value.success {
+            color: #10b981;
+        }
+        
+        .status-value.error {
+            color: #ef4444;
+        }
+        
+        .status-value.warning {
+            color: #f59e0b;
+        }
+        
+        /* 日志显示区域 */
+        .log-area {
+            margin-top: 2rem;
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(2, 8, 20, 0.6);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+        }
+        
+        .log-entry:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .log-entry.info {
+            color: #38bdf8;
+        }
+        
+        .log-entry.success {
+            color: #10b981;
+        }
+        
+        .log-entry.error {
+            color: #ef4444;
+        }
+        
+        .log-entry.warning {
+            color: #f59e0b;
+        }
+        
+        .log-timestamp {
+            color: #64748b;
+            margin-right: 0.5rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .test-area {
+                padding: 2rem;
+            }
+            
+            .test-button {
+                font-size: 1.125rem;
+                padding: 0.875rem 2rem;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .test-area {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        /* 滚动条样式 */
+        .log-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .log-area::-webkit-scrollbar-track {
+            background: rgba(2, 8, 20, 0.3);
+            border-radius: 4px;
+        }
+        
+        .log-area::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.3);
+            border-radius: 4px;
+        }
+        
+        .log-area::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部科技导航栏 - 严格按照图片样式 -->
+    <div class="tech-nav-bar">
+        <!-- 导航容器 - 一行布局 -->
+        <div class="tech-nav-container">
+            <!-- 左侧按钮组 - 3个按钮 -->
+            <div class="tech-nav-left">
+                <button class="tech-nav-btn active" data-section="project-overview">项目概况</button>
+                <button class="tech-nav-btn" data-section="production-info">生产信息</button>
+                <button class="tech-nav-btn" data-section="safety-info">安全信息</button>
+            </div>
+            
+            <!-- 中间标题 -->
+            <div class="tech-nav-title">
+                <div class="tech-nav-main-title">瓯越交建洞头厂区智慧梁厂信息化管控平台</div>
+            </div>
+            
+            <!-- 右侧按钮组 - 3个按钮 -->
+            <div class="tech-nav-right">
+                <button class="tech-nav-btn" data-section="quality-info">质量信息</button>
+                <button class="tech-nav-btn" data-section="material-info">物资信息</button>
+                <button class="tech-nav-btn" data-section="ai-process">AI工序识别</button>
+            </div>
+        </div>
+        
+        <!-- 底部蓝色发光线条 -->
+        <div class="tech-nav-glow-line"></div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>FaJiu 的 UE5.5 Claw 页面生成测试</h1>
+            <p>与Unreal Engine进行双向通信测试</p>
+        </div>
+        
+        <div class="test-area">
+            <button class="test-button" id="testButton">
+                🚀 Test
+            </button>
+            
+            <div class="status-area">
+                <div class="status-item">
+                    <span class="status-label">连接状态:</span>
+                    <span class="status-value" id="connectionStatus">检测中...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">消息发送:</span>
+                    <span class="status-value" id="sendCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">消息接收:</span>
+                    <span class="status-value" id="receiveCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">最后通信:</span>
+                    <span class="status-value" id="lastCommunication">-</span>
+                </div>
+            </div>
+            
+            <div class="log-area" id="logArea">
+                <div class="log-entry info">
+                    <span class="log-timestamp">[00:00:00]</span>
+                    系统初始化完成，等待测试...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        /**
+         * 测试页面应用
+         */
+        class TestApp {
+            constructor() {
+                this.sendCount = 0;
+                this.receiveCount = 0;
+                this.isConnected = false;
+                
+                this.elements = {
+                    testButton: document.getElementById('testButton'),
+                    connectionStatus: document.getElementById('connectionStatus'),
+                    sendCount: document.getElementById('sendCount'),
+                    receiveCount: document.getElementById('receiveCount'),
+                    lastCommunication: document.getElementById('lastCommunication'),
+                    logArea: document.getElementById('logArea')
+                };
+                
+                this.init();
+            }
+            
+            /**
+             * 初始化应用
+             */
+            init() {
+                // 检测UE接口
+                this.checkUEInterface();
+                
+                // 绑定事件
+                this.bindEvents();
+                
+                // 注册UE消息接收函数
+                this.registerUEMessageHandlers();
+                
+                // 记录初始化日志
+                this.log('info', '测试应用初始化完成');
+                this.log('info', '等待UE连接...');
+            }
+            
+            /**
+             * 检测UE接口状态
+             */
+            checkUEInterface() {
+                const hasUE = typeof window.ue === 'object';
+                const hasInterface = hasUE && typeof window.ue.interface === 'object';
+                const hasBroadcast = hasInterface && typeof window.ue.interface.broadcast === 'function';
+                const hasUE4 = typeof window.ue4 === 'function';
+                
+                this.isConnected = hasBroadcast && hasUE4;
+                
+                if (this.isConnected) {
+                    this.updateConnectionStatus('已连接', 'success');
+                    this.log('success', '检测到UE接口，通信已就绪');
+                } else {
+                    this.updateConnectionStatus('未连接', 'warning');
+                    this.log('warning', '未检测到UE接口，进入测试模式');
+                }
+            }
+            
+            /**
+             * 绑定UI事件
+             */
+            bindEvents() {
+                this.elements.testButton.addEventListener('click', () => {
+                    this.sendTestMessage();
+                });
+                
+                // 绑定导航按钮事件
+                this.bindNavButtons();
+            }
+            
+            /**
+             * 绑定导航按钮事件
+             */
+            bindNavButtons() {
+                const navButtons = document.querySelectorAll('.tech-nav-btn');
+                navButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const section = e.target.dataset.section;
+                        this.handleNavButtonClick(section, e.target);
+                    });
+                });
+            }
+            
+            /**
+             * 处理导航按钮点击
+             */
+            handleNavButtonClick(section, buttonElement) {
+                // 移除所有active类
+                document.querySelectorAll('.tech-nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // 添加active类到当前按钮
+                buttonElement.classList.add('active');
+                
+                // 更新中间标题
+                this.updateNavTitle(section);
+                
+                // 发送UE消息
+                this.sendNavEvent(section);
+                
+                // 记录日志
+                this.log('info', `导航到: ${section}`);
+            }
+            
+            /**
+             * 更新导航标题
+             */
+            updateNavTitle(section) {
+                const titleElement = document.querySelector('.tech-nav-main-title');
+                const sectionName = this.getSectionName(section);
+                if (titleElement) {
+                    titleElement.textContent = sectionName;
+                }
+            }
+            
+            /**
+             * 发送导航事件到UE
+             */
+            sendNavEvent(section) {
+                const eventData = {
+                    section: section,
+                    sectionName: this.getSectionName(section),
+                    timestamp: Date.now()
+                };
+                
+                this.sendCount++;
+                this.updateSendCount();
+                this.updateLastCommunication();
+                
+                try {
+                    window.ue4('OnNavButtonClicked', eventData);
+                    this.log('success', `导航事件已发送: ${eventData.sectionName}`);
+                } catch (error) {
+                    this.log('error', `导航事件发送失败: ${error.message}`);
+                }
+            }
+            
+            /**
+             * 获取区域显示名称
+             */
+            getSectionName(section) {
+                const sectionNames = {
+                    'project-overview': '项目概况',
+                    'production-info': '生产信息',
+                    'safety-info': '安全信息',
+                    'quality-info': '质量信息',
+                    'material-info': '物资信息',
+                    'ai-process': 'AI工序识别'
+                };
+                return sectionNames[section] || section;
+            }
+            
+            /**
+             * 发送测试消息
+             */
+            sendTestMessage() {
+                this.sendCount++;
+                this.updateSendCount();
+                this.updateLastCommunication();
+                
+                const testData = {
+                    message: '测试消息',
+                    timestamp: Date.now(),
+                    testNumber: Math.random(),
+                    sequence: this.sendCount
+                };
+                
+                this.log('info', `发送测试消息 #${this.sendCount}`);
+                this.log('info', `数据: ${JSON.stringify(testData, null, 2)}`);
+                
+                try {
+                    // 使用ue4发送消息到UE
+                    window.ue4('OnTestButtonClicked', testData);
+                    this.log('success', '消息发送成功');
+                    
+                    // 模拟UE响应（如果不在真实UE环境中）
+                    if (!this.isConnected) {
+                        setTimeout(() => {
+                            this.simulateUEResponse();
+                        }, 500);
+                    }
+                } catch (error) {
+                    this.log('error', `发送失败: ${error.message}`);
+                }
+            }
+            
+            /**
+             * 注册UE消息接收处理函数
+             */
+            registerUEMessageHandlers() {
+                // 定义接收UE消息的全局函数
+                window.ue.interface = window.ue.interface || {};
+                
+                // 通用消息接收
+                window.ue.interface.onMessageReceived = (data) => {
+                    this.receiveCount++;
+                    this.updateReceiveCount();
+                    this.updateLastCommunication();
+                    
+                    let parsedData;
+                    try {
+                        parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+                    } catch (e) {
+                        parsedData = data;
+                    }
+                    
+                    this.log('success', `收到UE消息 #${this.receiveCount}`);
+                    this.log('info', `数据: ${JSON.stringify(parsedData, null, 2)}`);
+                };
+                
+                // 测试响应接收
+                window.ue.interface.onTestResponse = (data) => {
+                    this.receiveCount++;
+                    this.updateReceiveCount();
+                    this.updateLastCommunication();
+                    
+                    let parsedData;
+                    try {
+                        parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+                    } catch (e) {
+                        parsedData = data;
+                    }
+                    
+                    this.log('success', `收到测试响应 #${this.receiveCount}`);
+                    this.log('info', `响应数据: ${JSON.stringify(parsedData, null, 2)}`);
+                };
+                
+                // 连接状态更新
+                window.ue.interface.onConnectionStatus = (data) => {
+                    let parsedData;
+                    try {
+                        parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+                    } catch (e) {
+                        parsedData = data;
+                    }
+                    
+                    const status = parsedData.connected ? '已连接' : '未连接';
+                    const statusClass = parsedData.connected ? 'success' : 'warning';
+                    
+                    this.updateConnectionStatus(status, statusClass);
+                    this.log('info', `连接状态更新: ${status}`);
+                };
+            }
+            
+            /**
+             * 模拟UE响应（测试模式）
+             */
+            simulateUEResponse() {
+                const mockResponse = {
+                    success: true,
+                    message: '模拟UE响应',
+                    receivedAt: Date.now(),
+                    responseTime: Math.random() * 100
+                };
+                
+                // 调用消息处理函数
+                if (window.ue.interface.onTestResponse) {
+                    window.ue.interface.onTestResponse(JSON.stringify(mockResponse));
+                }
+            }
+            
+            /**
+             * 更新连接状态
+             */
+            updateConnectionStatus(status, className) {
+                this.elements.connectionStatus.textContent = status;
+                this.elements.connectionStatus.className = `status-value ${className}`;
+            }
+            
+            /**
+             * 更新发送计数
+             */
+            updateSendCount() {
+                this.elements.sendCount.textContent = this.sendCount;
+            }
+            
+            /**
+             * 更新接收计数
+             */
+            updateReceiveCount() {
+                this.elements.receiveCount.textContent = this.receiveCount;
+            }
+            
+            /**
+             * 更新最后通信时间
+             */
+            updateLastCommunication() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('zh-CN');
+                this.elements.lastCommunication.textContent = timeString;
+            }
+            
+            /**
+             * 记录日志
+             */
+            log(level, message) {
+                const timestamp = new Date().toLocaleTimeString('zh-CN');
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry ${level}`;
+                
+                // 限制日志条目长度
+                const displayMessage = message.length > 200 ? 
+                    message.substring(0, 200) + '...' : message;
+                
+                logEntry.innerHTML = `
+                    <span class="log-timestamp">[${timestamp}]</span>
+                    ${displayMessage}
+                `;
+                
+                this.elements.logArea.appendChild(logEntry);
+                
+                // 限制日志数量，保持最新的50条
+                const logs = this.elements.logArea.querySelectorAll('.log-entry');
+                if (logs.length > 50) {
+                    logs[0].remove();
+                }
+                
+                // 自动滚动到底部
+                this.elements.logArea.scrollTop = this.elements.logArea.scrollHeight;
+                
+                // 控制台也输出
+                console.log(`[${level.toUpperCase()}] ${message}`);
+            }
+        }
+        
+        // 页面加载完成后初始化应用
+        document.addEventListener('DOMContentLoaded', () => {
+            window.testApp = new TestApp();
+        });
+    </script>
+</body>
+</html>
