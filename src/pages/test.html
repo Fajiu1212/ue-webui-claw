@@ -104,8 +104,8 @@
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            height: 120px;
+            width: 1920pt;
+            height: 200pt;
             background: var(--nav-bg-image) center/100% 100% no-repeat;
             border: none;
             z-index: 10;
@@ -115,10 +115,10 @@
         /* 导航容器 - 一行布局 */
         .tech-nav-container {
             position: absolute;
-            top: 0;
+            top: 26pt;
             left: 0;
             right: 0;
-            height: 100%;
+            height: 24pt;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -164,7 +164,9 @@
             background: rgba(15, 23, 42, 0.8);
             border: 1px solid rgba(56, 189, 248, 0.4);
             color: #e2e8f0;
-            padding: 0.75rem 1.5rem;
+            width: 88pt;
+            height: 24pt;
+            padding: 0;
             font-size: 0.875rem;
             font-weight: 600;
             border-radius: 4px;
@@ -230,8 +232,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: calc(100vh - 7.5rem); /* 减去顶部菜单栏高度(120px，以16px基准字号计算 = 7.5rem) + 间距 */
-            margin-top: 7.5rem;
+            height: calc(100vh - 200pt); /* 减去顶部菜单栏高度(200pt) + 间距 */
+            margin-top: 200pt;
             position: relative;
             z-index: 1;
             padding: 2rem;
