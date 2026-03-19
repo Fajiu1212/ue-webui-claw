@@ -80,9 +80,11 @@
             font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #e2e8f0;
-            height: 100vh;
+            width: 1920px;
+            height: 1080px;
             overflow: hidden;
             position: relative;
+            margin: 0;
         }
         
         /* 背景装饰效果 */
@@ -104,8 +106,8 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 1920pt;
-            height: 200pt;
+            width: 1920px;
+            height: 200px;
             background: var(--nav-bg-image) center/100% 100% no-repeat;
             border: none;
             z-index: 10;
@@ -115,10 +117,10 @@
         /* 导航容器 - 一行布局 */
         .tech-nav-container {
             position: absolute;
-            top: 26pt;
+            top: 26px;
             left: 0;
             right: 0;
-            height: 24pt;
+            height: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -164,8 +166,8 @@
             background: rgba(15, 23, 42, 0.8);
             border: 1px solid rgba(56, 189, 248, 0.4);
             color: #e2e8f0;
-            width: 88pt;
-            height: 24pt;
+            width: 88px;
+            height: 24px;
             padding: 0;
             font-size: 0.875rem;
             font-weight: 600;
@@ -232,11 +234,118 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: calc(100vh - 200pt); /* 减去顶部菜单栏高度(200pt) + 间距 */
-            margin-top: 200pt;
+            height: calc(1080px - 200px); /* 减去顶部菜单栏高度(200px) */
+            margin-top: 200px;
+            margin-left: 280px; /* 为左侧菜单留出空间 */
             position: relative;
             z-index: 1;
             padding: 2rem;
+        }
+        
+        /* 左侧树状菜单 */
+        .sidebar-menu {
+            position: absolute;
+            top: 200px;
+            left: 0;
+            width: 280px;
+            height: calc(1080px - 200px);
+            background: rgba(15, 23, 42, 0.9);
+            border-right: 1px solid rgba(56, 189, 248, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            overflow-y: auto;
+            z-index: 5;
+        }
+        
+        .menu-tree {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .menu-item {
+            margin: 0.25rem 0;
+        }
+        
+        .menu-item-header {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #e2e8f0;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            background: url('https://github.com/user-attachments/assets/3af54751-b68d-4228-abe8-10794ae50587') center/cover no-repeat;
+        }
+        
+        .menu-item-header:hover {
+            background: url('https://github.com/user-attachments/assets/3af54751-b68d-4228-abe8-10794ae50587') center/cover no-repeat;
+            filter: brightness(1.2);
+        }
+        
+        .menu-item-header.active {
+            background: url('https://github.com/user-attachments/assets/3af54751-b68d-4228-abe8-10794ae50587') center/cover no-repeat;
+            filter: brightness(1.3) saturate(1.2);
+            border-left-color: var(--nav-accent);
+            color: #38bdf8;
+        }
+        
+        .menu-arrow {
+            display: none;
+        }
+        
+        .menu-children {
+            list-style: none;
+            padding-left: 2.5rem;
+            margin: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .menu-children.expanded {
+            max-height: 500px;
+        }
+        
+        .menu-child-item {
+            padding: 0.5rem 1rem;
+            margin: 0.25rem 0;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+        
+        .menu-child-item:hover {
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.05);
+            border-left-color: rgba(56, 189, 248, 0.3);
+        }
+        
+        .menu-child-item.active {
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            border-left-color: var(--nav-accent);
+        }
+        
+        /* 菜单滚动条样式 */
+        .sidebar-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(2, 8, 20, 0.3);
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.3);
+            border-radius: 3px;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.5);
         }
         
         /* 标题区域 */
@@ -505,6 +614,58 @@
         
     </div>
     
+    <!-- 左侧树状菜单 -->
+    <nav class="sidebar-menu">
+        <ul class="menu-tree">
+            <li class="menu-item">
+                <div class="menu-item-header" data-menu="twin-simulation">
+                    <span>孪生仿真建造</span>
+                </div>
+                <ul class="menu-children">
+                    <li class="menu-child-item" data-child="ts-1">功能模块 1</li>
+                    <li class="menu-child-item" data-child="ts-2">功能模块 2</li>
+                    <li class="menu-child-item" data-child="ts-3">功能模块 3</li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <div class="menu-item-header" data-menu="intelligent-construction">
+                    <span>智能建造与装备</span>
+                </div>
+                <ul class="menu-children">
+                    <li class="menu-child-item" data-child="ic-1">功能模块 1</li>
+                    <li class="menu-child-item" data-child="ic-2">功能模块 2</li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <div class="menu-item-header" data-menu="ai-application">
+                    <span>AI应用</span>
+                </div>
+                <ul class="menu-children">
+                    <li class="menu-child-item" data-child="ai-1">功能模块 1</li>
+                    <li class="menu-child-item" data-child="ai-2">功能模块 2</li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <div class="menu-item-header" data-menu="personnel-management">
+                    <span>人员管理</span>
+                </div>
+                <ul class="menu-children">
+                    <li class="menu-child-item" data-child="pm-1">功能模块 1</li>
+                    <li class="menu-child-item" data-child="pm-2">功能模块 2</li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <div class="menu-item-header" data-menu="video-monitoring">
+                    <span>视频监控</span>
+                </div>
+                <ul class="menu-children">
+                    <li class="menu-child-item" data-child="vm-1">功能模块 1</li>
+                    <li class="menu-child-item" data-child="vm-2">功能模块 2</li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    
     <div class="container">
         <div class="header">
             <h1>FaJiu 的 UE5.5 Claw 页面生成测试</h1>
@@ -614,6 +775,78 @@
                 
                 // 绑定导航按钮事件
                 this.bindNavButtons();
+                
+                // 绑定左侧菜单事件
+                this.bindSidebarMenu();
+            }
+            
+            /**
+             * 绑定左侧菜单事件
+             */
+            bindSidebarMenu() {
+                // 绑定父菜单点击事件（展开/收起）
+                const menuHeaders = document.querySelectorAll('.menu-item-header');
+                menuHeaders.forEach(header => {
+                    header.addEventListener('click', (e) => {
+                        const menuItem = e.currentTarget;
+                        const menuId = menuItem.dataset.menu;
+                        const arrow = menuItem.querySelector('.menu-arrow');
+                        const children = menuItem.parentElement.querySelector('.menu-children');
+                        
+                        // 切换展开状态
+                        arrow.classList.toggle('expanded');
+                        children.classList.toggle('expanded');
+                        
+                        // 发送UE消息
+                        this.sendMenuEvent('parent', menuId, menuItem.textContent.trim());
+                        
+                        this.log('info', `菜单展开/收起: ${menuId}`);
+                    });
+                });
+                
+                // 绑定子菜单点击事件
+                const childItems = document.querySelectorAll('.menu-child-item');
+                childItems.forEach(child => {
+                    child.addEventListener('click', (e) => {
+                        const childItem = e.target;
+                        const childId = childItem.dataset.child;
+                        const childText = childItem.textContent;
+                        
+                        // 移除其他子菜单的active状态
+                        childItems.forEach(item => item.classList.remove('active'));
+                        
+                        // 添加active状态
+                        childItem.classList.add('active');
+                        
+                        // 发送UE消息
+                        this.sendMenuEvent('child', childId, childText);
+                        
+                        this.log('info', `子菜单点击: ${childId} - ${childText}`);
+                    });
+                });
+            }
+            
+            /**
+             * 发送菜单事件到UE
+             */
+            sendMenuEvent(type, id, name) {
+                this.sendCount++;
+                this.updateSendCount();
+                this.updateLastCommunication();
+                
+                const eventData = {
+                    type: type,
+                    id: id,
+                    name: name,
+                    timestamp: Date.now()
+                };
+                
+                try {
+                    window.ue4('OnMenuItemClicked', eventData);
+                    this.log('success', `菜单事件已发送: ${name}`);
+                } catch (error) {
+                    this.log('error', `菜单事件发送失败: ${error.message}`);
+                }
             }
             
             /**
